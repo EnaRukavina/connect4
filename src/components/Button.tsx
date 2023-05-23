@@ -4,8 +4,9 @@ type ButtonProps = {
   label: string;
   iconName?: keyof typeof Images;
   color?: 'yellow' | 'pink' | 'white';
+  onClick?: any;
 };
-const Button = ({ label, iconName, color }: ButtonProps) => {
+const Button = ({ label, iconName, color, onClick }: ButtonProps) => {
   const colorClasses = {
     yellow: 'bg-yellow',
     pink: 'bg-pink',
@@ -16,10 +17,11 @@ const Button = ({ label, iconName, color }: ButtonProps) => {
   return (
     <button
       type='button'
-      className={`${bgColorClass} flex justify-between items-center font-bold uppercase text-2xl w-full shadow-custom border-3 hover:border-purple-dark hover:shadow-purple-dark border-black rounded-[20px] h-[72px] text-left px-5 transition-colors active:translate-y-1 active:shadow-[0_7px_0]`}
+      onClick={onClick}
+      className={`${bgColorClass} flex justify-between items-center font-bold uppercase text-2xl w-full shadow-custom border-3 hover:border-purple-dark hover:shadow-purple-dark border-black rounded-[20px] h-[72px] text-left px-5 transition-colors active:translate-y-1 active:shadow-[0_7px_0] active:shadow-purple-dark`}
     >
-      <label>{label}</label>
-      {iconName && <img src={Images[iconName]} />}
+      <label className='cursor-pointer shrink-0'>{label}</label>
+      {iconName && <img src={Images[iconName]} className='h-10' />}
     </button>
   );
 };
