@@ -12,6 +12,12 @@ module.exports = {
       fontFamily: {
         'space-grotesk': ['"Space Grotesk"', 'sans-serif'],
       },
+      boxShadow: {
+        custom: '0 10px 0 rgba(0,0,0)',
+      },
+      borderWidth: {
+        3: '3px',
+      },
     },
   },
   plugins: [],
