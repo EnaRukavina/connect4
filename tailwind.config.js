@@ -14,6 +14,7 @@ module.exports = {
       },
       boxShadow: {
         custom: '0 10px 0 rgba(0,0,0)',
+        'custom-thinner': '0 5px 0 rgba(0,0,0)',
       },
       borderWidth: {
         3: '3px',

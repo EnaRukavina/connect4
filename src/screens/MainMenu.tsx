@@ -14,6 +14,9 @@ const MainMenu = () => {
             label='Play vs player'
             iconName='player-vs-player'
             color='yellow'
+            onClick={() => {
+              navigate('pvp');
+            }}
           />
           <Button
             label='Game rules'

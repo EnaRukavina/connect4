@@ -20,3 +20,31 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.body-text {
+  font-size: 16px;
+  font-weight: 500;
+  line-height: 21px;
+  opacity: 0.66;
+}
+
+.heading-l {
+  font-size: 56px;
+  font-weight: 700;
+  line-height: 71px;
+}
+.heading-m {
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 31px;
+}
+.heading-s {
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 26px;
+}
+.heading-xs {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 21px;
+}
