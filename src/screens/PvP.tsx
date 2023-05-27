@@ -11,7 +11,7 @@ const PvP = () => {
     [0, 0, 0, 0, 0, 0, 0],
   ];
 
-  const initialCountdown = 10;
+  const initialCountdown = 25;
 
   const [board, setBoard] = useState<number[][]>(emptyBoard);
   const [hoveredColumn, setHoveredColumn] = useState<number>();
@@ -41,6 +41,10 @@ const PvP = () => {
       clearInterval(timer);
       setTurn(prevTurn => (prevTurn === 1 ? 2 : 1));
       resetCountdown();
+    }
+
+    if (winner !== 0) {
+      clearInterval(timer);
     }
 
     // Clear the timer when the component unmounts
@@ -93,7 +97,10 @@ const PvP = () => {
           current === board[row + 2][col] &&
           current === board[row + 3][col]
         ) {
-          return current;
+          for (let i = 0; i < 4; i++) {
+            winningTiles.push([row + i, col]);
+          }
+          return { winner: current, winningTiles };
         }
       }
     }
@@ -108,7 +115,10 @@ const PvP = () => {
           current === board[row + 2][col + 2] &&
           current === board[row + 3][col + 3]
         ) {
-          return current;
+          for (let i = 0; i < 4; i++) {
+            winningTiles.push([row + i, col + i]);
+          }
+          return { winner: current, winningTiles };
         }
       }
     }
@@ -123,13 +133,26 @@ const PvP = () => {
           current === board[row + 2][col - 2] &&
           current === board[row + 3][col - 3]
         ) {
-          return current;
+          for (let i = 0; i < 4; i++) {
+            winningTiles.push([row + i, col - i]);
+          }
+          return { winner: current, winningTiles };
         }
       }
     }
 
-    return 0; // No winner found
+    return { winner: 0, winningTiles: [] }; // No winner found
   };
+
+  const isBoardFull = () => {
+    return board.every(row => row.every(cell => cell !== 0));
+  };
+
+  useEffect(() => {
+    if (isBoardFull() && winner === 0) {
+      setRound(prevRound => prevRound + 1); // Increase the round number
+    }
+  }, [board]);
 
   const handleColumnClick = (columnIdx: any) => {
     if (winner !== 0) {
@@ -153,24 +176,23 @@ const PvP = () => {
       const updatedBoard = [...board]; // Create a copy of the board array
       updatedBoard[lowestRow][columnIdx] = turn; // Update the value
       setBoard(updatedBoard); // Update the state with the new board
-      changePlayerTurn(); // Change the player turn
-      const winner = checkWin(); // Check if there's a winner
-      console.log({ winner });
-      if (winner !== 0) {
-        // If there's a winner
-        if (winner === 1) {
-          // If player 1 won
-          setWinner(1); // Set the winner state to player 1
-          setPlayer1Score(player1Score + 1); // Increment player 1's score
-        } else {
-          // If player 2 won
-          setWinner(2); // Set the winner state to player 2
-          setPlayer2Score(player2Score + 1); // Increment player 2's score
-        }
-        setRound(round + 1); // Increment the round
-      }
+      changePlayerTurn();
     }
   };
+
+  useEffect(() => {
+    const winner = checkWin().winner; // Check if there's a winner
+    if (winner !== 0) {
+      if (winner === 1) {
+        setWinner(1);
+        setPlayer1Score(player1Score + 1);
+      } else {
+        setWinner(2);
+        setPlayer2Score(player2Score + 1);
+      }
+      setRound(prevRound => prevRound + 1); // Increment the round number
+    }
+  }, [board]);
 
   const handleReset = () => {
     setBoard(emptyBoard);
@@ -191,6 +213,16 @@ const PvP = () => {
     setPlayer1Score(0);
     setPlayer2Score(0);
     setRound(1);
+  };
+
+  const getWinningTilesIndex = () => {
+    if (winner) {
+      const res = checkWin().winningTiles.map(x => {
+        return x[0] * 7 + x[1];
+      });
+      return res;
+    }
+    return;
   };
 
   return (
@@ -248,16 +280,27 @@ const PvP = () => {
                   return (
                     <div key={idx}>
                       {x ? (
-                        <img
-                          src={
-                            Images[
-                              x === 1
-                                ? 'counter-red-large'
-                                : 'counter-yellow-large'
-                            ]
-                          }
-                          alt='counter-red-large'
-                        />
+                        <div className='relative'>
+                          <img
+                            src={
+                              Images[
+                                x === 1
+                                  ? 'counter-red-large'
+                                  : 'counter-yellow-large'
+                              ]
+                            }
+                            alt='counter-red-large'
+                          />
+                          {getWinningTilesIndex()?.map(x => {
+                            if (x === idx)
+                              return (
+                                <div
+                                  key={x}
+                                  className='absolute top-[-2px] bottom-0 left-0 right-0 m-auto w-8 h-8 border-[6px] border-white rounded-full bg-transparent'
+                                />
+                              );
+                          })}
+                        </div>
                       ) : null}
                     </div>
                   );
@@ -269,9 +312,11 @@ const PvP = () => {
                 alt='board-layer-white-large'
               />
 
-              {winner ? (
+              {winner || isBoardFull() ? (
                 <div className='w-[285px] rounded-[20px]  border-3 border-black shadow-custom items-center py-4 text-center uppercase flex-col absolute left-0 right-0 m-auto flex z-50 -bottom-[110px] bg-white'>
-                  <p className='heading-xs '>player {winner}</p>
+                  <p className='heading-xs '>{`${
+                    winner ? `player ${winner}` : 'no one'
+                  } `}</p>
                   <p className='heading-l'>wins</p>
                   <button
                     onClick={handleReset}
@@ -310,6 +355,7 @@ const PvP = () => {
                 {new Array(7).fill(0).map((_, idx) => {
                   return (
                     <div
+                      key={idx}
                       className='h-full w-full'
                       onClick={() => {
                         handleColumnClick(idx);
