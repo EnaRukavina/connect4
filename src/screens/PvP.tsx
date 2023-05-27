@@ -10,7 +10,6 @@ const PvP = () => {
     [0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0],
   ];
-
   const initialCountdown = 25;
 
   const [board, setBoard] = useState<number[][]>(emptyBoard);
@@ -228,8 +227,25 @@ const PvP = () => {
   return (
     <div className='bg-purple-light h-full w-full flex justify-center relative'>
       <div className=''>
-        <div className='flex items-center gap-[60px]'>
-          <div className='w-[140px] h-[160px] bg-white border-3 border-black shadow-custom text-center rounded-[20px] relative'>
+        <div className='grid grid-rows-auto grid-cols-[auto_1fr_auto] gap-x-[60px] items-center'>
+          <div className='row-span-1 col-span-1'></div>
+
+          <nav className='my-12 row-span-1 col-span-1 flex  items-center h-fit justify-between'>
+            <button className='text-white uppercase heading-xs bg-purple-dark hover:bg-pink rounded-full px-5 py-2.5 transition'>
+              menu
+            </button>
+            <img src={Images['logo']} alt='logo' />
+            <button
+              onClick={handleRestart}
+              className='text-white uppercase heading-xs bg-purple-dark hover:bg-pink rounded-full px-5 py-2.5 transition'
+            >
+              restart
+            </button>
+          </nav>
+          {/* empty div */}
+          <div className='row-span-1 col-span-1'></div>
+          {/*  */}
+          <div className='bottom-[50px] w-[140px] h-[160px] bg-white border-3 border-black shadow-custom text-center rounded-[20px] relative row-span-1 col-span-1 '>
             <img
               src={Images['player-one']}
               alt='player-one-icon'
@@ -238,142 +254,127 @@ const PvP = () => {
             <p className='heading-s uppercase mt-[46px]'>player 1</p>
             <p className='heading-l'>{player1Score}</p>
           </div>
-          <div className=''>
-            <nav className='my-12 flex justify-between items-center'>
-              <button className='text-white uppercase heading-xs bg-purple-dark hover:bg-pink rounded-full px-5 py-2.5 transition'>
-                menu
-              </button>
-              <img src={Images['logo']} alt='logo' />
-              <button
-                onClick={handleRestart}
-                className='text-white uppercase heading-xs bg-purple-dark hover:bg-pink rounded-full px-5 py-2.5 transition'
-              >
-                restart
-              </button>
-            </nav>
-            <main className='relative z-50'>
-              <img
-                className='z-10'
-                src={Images['board-layer-black-large']}
-                alt='board-layer-black-large'
-              />
-              <div
-                id='markers'
-                className='absolute -top-[36px] grid grid-cols-7 w-full justify-items-center'
-              >
-                {new Array(7).fill(0).map((_, idx) => {
-                  return (
-                    <img
-                      key={idx}
-                      src={Images[turn === 1 ? 'marker-red' : 'marker-yellow']}
-                      alt={turn === 1 ? 'marker-red' : 'marker-yellow'}
-                      className={hoveredColumn === idx ? '' : 'invisible'}
-                    />
-                  );
-                })}
-              </div>
-              <div
-                id='board'
-                className='p-4 pl-0 pb-12 justify-items-end absolute top-0 z-20 grid grid-cols-7 grid-rows-6 w-full h-full'
-              >
-                {board.flat().map((x, idx) => {
-                  return (
-                    <div key={idx}>
-                      {x ? (
-                        <div className='relative'>
-                          <img
-                            src={
-                              Images[
-                                x === 1
-                                  ? 'counter-red-large'
-                                  : 'counter-yellow-large'
-                              ]
-                            }
-                            alt='counter-red-large'
-                          />
-                          {getWinningTilesIndex()?.map(x => {
-                            if (x === idx)
-                              return (
-                                <div
-                                  key={x}
-                                  className='absolute top-[-2px] bottom-0 left-0 right-0 m-auto w-8 h-8 border-[6px] border-white rounded-full bg-transparent'
-                                />
-                              );
-                          })}
-                        </div>
-                      ) : null}
-                    </div>
-                  );
-                })}
-              </div>
-              <img
-                className='absolute top-0 z-30'
-                src={Images['board-layer-white-large']}
-                alt='board-layer-white-large'
-              />
-
-              {winner || isBoardFull() ? (
-                <div className='w-[285px] rounded-[20px]  border-3 border-black shadow-custom items-center py-4 text-center uppercase flex-col absolute left-0 right-0 m-auto flex z-50 -bottom-[110px] bg-white'>
-                  <p className='heading-xs '>{`${
-                    winner ? `player ${winner}` : 'no one'
-                  } `}</p>
-                  <p className='heading-l'>wins</p>
-                  <button
-                    onClick={handleReset}
-                    className='text-white uppercase heading-xs bg-purple-dark hover:bg-pink rounded-full px-5 py-2.5 transition'
-                  >
-                    play again
-                  </button>
-                </div>
-              ) : (
-                <div className='text-center text-white absolute left-0 right-0 m-auto flex w-fit z-50 -bottom-[110px]'>
+          <main className='flex-grow row-span-1 col-span-1 items-center relative z-50'>
+            <img
+              className='z-10'
+              src={Images['board-layer-black-large']}
+              alt='board-layer-black-large'
+            />
+            <div
+              id='markers'
+              className='absolute -top-[36px] grid grid-cols-7 w-full justify-items-center'
+            >
+              {new Array(7).fill(0).map((_, idx) => {
+                return (
                   <img
-                    src={
-                      Images[
-                        turn === 1
-                          ? 'turn-background-red'
-                          : 'turn-background-yellow'
-                      ]
-                    }
-                    alt='turn-background-red'
+                    key={idx}
+                    src={Images[turn === 1 ? 'marker-red' : 'marker-yellow']}
+                    alt={turn === 1 ? 'marker-red' : 'marker-yellow'}
+                    className={hoveredColumn === idx ? '' : 'invisible'}
                   />
-
-                  <div className='absolute right-0 left-0 m-auto h-fit pt-4 top-0 bottom-0'>
-                    <p className='heading-xs uppercase '>
-                      player {turn}'s turn
-                    </p>
-                    <p className='heading-l'>{`${countdown}s`}</p>
+                );
+              })}
+            </div>
+            <div
+              id='board'
+              className='p-4 pl-0 pb-12 justify-items-end absolute top-0 z-20 grid grid-cols-7 grid-rows-6 w-full h-full'
+            >
+              {board.flat().map((x, idx) => {
+                return (
+                  <div key={idx}>
+                    {x ? (
+                      <div className='relative'>
+                        <img
+                          src={
+                            Images[
+                              x === 1
+                                ? 'counter-red-large'
+                                : 'counter-yellow-large'
+                            ]
+                          }
+                          alt='counter-red-large'
+                        />
+                        {getWinningTilesIndex()?.map(x => {
+                          if (x === idx)
+                            return (
+                              <div
+                                key={x}
+                                className='absolute top-[-2px] bottom-0 left-0 right-0 m-auto w-8 h-8 border-[6px] border-white rounded-full bg-transparent'
+                              />
+                            );
+                        })}
+                      </div>
+                    ) : null}
                   </div>
-                </div>
-              )}
+                );
+              })}
+            </div>
+            <img
+              className='absolute top-0 z-30'
+              src={Images['board-layer-white-large']}
+              alt='board-layer-white-large'
+            />
 
-              {/* overlay columns for hover effect */}
-              <div
-                id='overlay'
-                className='justify-items-end absolute top-0 z-50 grid grid-cols-7  w-full h-full'
-              >
-                {new Array(7).fill(0).map((_, idx) => {
-                  return (
-                    <div
-                      key={idx}
-                      className='h-full w-full'
-                      onClick={() => {
-                        handleColumnClick(idx);
-                      }}
-                      onMouseOver={() => {
-                        setHoveredColumn(idx);
-                      }}
-                      onMouseOut={() => {
-                        setHoveredColumn(undefined);
-                      }}
-                    />
-                  );
-                })}
+            {winner || isBoardFull() ? (
+              <div className='w-[285px] rounded-[20px]  border-3 border-black shadow-custom items-center py-4 text-center uppercase flex-col absolute left-0 right-0 m-auto flex z-50 -bottom-[110px] bg-white'>
+                <p className='heading-xs '>{`${
+                  winner ? `player ${winner}` : 'no one'
+                } `}</p>
+                <p className='heading-l'>wins</p>
+                <button
+                  onClick={handleReset}
+                  className='text-white uppercase heading-xs bg-purple-dark hover:bg-pink rounded-full px-5 py-2.5 transition'
+                >
+                  play again
+                </button>
               </div>
-              {/*  */}
-            </main>
-          </div>
-          <div className='w-[140px] h-[160px] bg-white border-3 border-black shadow-custom text-center rounded-[20px] relative'>
+            ) : (
+              <div className='text-center text-white absolute left-0 right-0 m-auto flex w-fit z-50 -bottom-[110px]'>
+                <img
+                  src={
+                    Images[
+                      turn === 1
+                        ? 'turn-background-red'
+                        : 'turn-background-yellow'
+                    ]
+                  }
+                  alt='turn-background-red'
+                />
+
+                <div className='absolute right-0 left-0 m-auto h-fit pt-4 top-0 bottom-0'>
+                  <p className='heading-xs uppercase '>player {turn}'s turn</p>
+                  <p className='heading-l'>{`${countdown}s`}</p>
+                </div>
+              </div>
+            )}
+
+            {/* overlay columns for hover effect */}
+            <div
+              id='overlay'
+              className='justify-items-end absolute top-0 z-50 grid grid-cols-7  w-full h-full'
+            >
+              {new Array(7).fill(0).map((_, idx) => {
+                return (
+                  <div
+                    key={idx}
+                    className='h-full w-full'
+                    onClick={() => {
+                      handleColumnClick(idx);
+                    }}
+                    onMouseOver={() => {
+                      setHoveredColumn(idx);
+                    }}
+                    onMouseOut={() => {
+                      setHoveredColumn(undefined);
+                    }}
+                  />
+                );
+              })}
+            </div>
+            {/*  */}
+          </main>
+
+          <div className='bottom-[50px] w-[140px] h-[160px] bg-white border-3 border-black shadow-custom text-center rounded-[20px] relative row-span-1 col-span-1'>
             <img
               src={Images['player-two']}
               alt='player-two-icon'
@@ -385,7 +386,7 @@ const PvP = () => {
         </div>
       </div>
       <div
-        className={`h-[22%] ${color} w-full bottom-0 absolute rounded-t-[60px]`}
+        className={`h-[30%] ${color} w-full bottom-0 absolute rounded-t-[60px]`}
       ></div>
     </div>
   );
