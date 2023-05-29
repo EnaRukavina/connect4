@@ -1,7 +1,14 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Images } from '../assets/images';
+import { GameButton } from '../components/GameButton';
+import { PlayerCard } from '../components/PlayerCard';
+import { motion } from 'framer-motion';
+import Button from '../components/Button';
+import { useNavigate } from 'react-router-dom';
 
 const PvP = () => {
+  const navigate = useNavigate();
+
   const emptyBoard = [
     [0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0],
@@ -10,7 +17,7 @@ const PvP = () => {
     [0, 0, 0, 0, 0, 0, 0],
     [0, 0, 0, 0, 0, 0, 0],
   ];
-  const initialCountdown = 25;
+  const initialCountdown = 30;
 
   const [board, setBoard] = useState<number[][]>(emptyBoard);
   const [hoveredColumn, setHoveredColumn] = useState<number>();
@@ -20,39 +27,12 @@ const PvP = () => {
   const [winner, setWinner] = useState<0 | 1 | 2>(0);
   const [round, setRound] = useState<number>(1);
   const [countdown, setCountdown] = useState<number>(initialCountdown);
+  const [countdownPaused, setCountdownPaused] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const color =
     winner === 1 ? 'bg-pink' : winner === 2 ? 'bg-yellow' : 'bg-purple-dark';
-
-  useEffect(() => {
-    let timer: NodeJS.Timeout | null = null;
-    const decrementCountdown = () => {
-      setCountdown(prevCountdown => prevCountdown - 1);
-    };
-    const resetCountdown = () => {
-      setCountdown(initialCountdown);
-    };
-
-    timer = setInterval(decrementCountdown, 1000); // Decrement the countdown every second
-
-    // Clear the timer and change the player's turn when the countdown reaches 0
-    if (countdown === 0) {
-      clearInterval(timer);
-      setTurn(prevTurn => (prevTurn === 1 ? 2 : 1));
-      resetCountdown();
-    }
-
-    if (winner !== 0) {
-      clearInterval(timer);
-    }
-
-    // Clear the timer when the component unmounts
-    return () => {
-      if (timer) {
-        clearInterval(timer);
-      }
-    };
-  }, [countdown, turn]);
 
   const changePlayerTurn = () => {
     setTurn(turn === 1 ? 2 : 1);
@@ -147,12 +127,6 @@ const PvP = () => {
     return board.every(row => row.every(cell => cell !== 0));
   };
 
-  useEffect(() => {
-    if (isBoardFull() && winner === 0) {
-      setRound(prevRound => prevRound + 1); // Increase the round number
-    }
-  }, [board]);
-
   const handleColumnClick = (columnIdx: any) => {
     if (winner !== 0) {
       return; // Disable clicking on the board if there is a winner
@@ -179,6 +153,47 @@ const PvP = () => {
     }
   };
 
+  const getWinningTilesIndex = () => {
+    if (winner) {
+      const res = checkWin().winningTiles.map(x => {
+        return x[0] * 7 + x[1];
+      });
+      return res;
+    }
+    return;
+  };
+
+  useEffect(() => {
+    const decrementCountdown = () => {
+      setCountdown(prevCountdown => prevCountdown - 1);
+    };
+    const resetCountdown = () => {
+      setCountdown(initialCountdown);
+    };
+
+    if (!countdownPaused) {
+      timerRef.current = setInterval(decrementCountdown, 1000);
+    }
+
+    // Clear the timer and change the player's turn when the countdown reaches 0
+    if (countdown === 0) {
+      clearInterval(timerRef.current as NodeJS.Timeout);
+      setTurn(prevTurn => (prevTurn === 1 ? 2 : 1));
+      resetCountdown();
+    }
+
+    if (winner !== 0) {
+      clearInterval(timerRef.current as NodeJS.Timeout);
+    }
+
+    // Clear the timer when the component unmounts
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current as NodeJS.Timeout);
+      }
+    };
+  }, [countdown, turn, countdownPaused]);
+
   useEffect(() => {
     const winner = checkWin().winner; // Check if there's a winner
     if (winner !== 0) {
@@ -190,6 +205,12 @@ const PvP = () => {
         setPlayer2Score(player2Score + 1);
       }
       setRound(prevRound => prevRound + 1); // Increment the round number
+    }
+  }, [board]);
+
+  useEffect(() => {
+    if (isBoardFull() && winner === 0) {
+      setRound(prevRound => prevRound + 1); // Increase the round number
     }
   }, [board]);
 
@@ -212,48 +233,57 @@ const PvP = () => {
     setPlayer1Score(0);
     setPlayer2Score(0);
     setRound(1);
+    setMenuOpen(false);
   };
 
-  const getWinningTilesIndex = () => {
-    if (winner) {
-      const res = checkWin().winningTiles.map(x => {
-        return x[0] * 7 + x[1];
-      });
-      return res;
-    }
-    return;
+  const handleOpenMenu = () => {
+    setMenuOpen(true);
+    setCountdownPaused(true);
+  };
+
+  const handleContinueGame = () => {
+    setMenuOpen(false);
+    setCountdownPaused(false);
   };
 
   return (
-    <div className='bg-purple-light h-full w-full flex justify-center relative'>
+    <div className='bg-purple-light h-screen w-screen overflow-auto flex justify-center '>
+      {menuOpen && (
+        <div className='absolute top-0 left-0 flex items-center justify-center bg-black/50 z-[100] h-full w-full'>
+          <div className='p-10 gap-6 w-[480px] bg-purple-light rounded-[40px] lg:border-3 border-black lg:shadow-custom flex flex-col items-center '>
+            <h1 className='heading-l text-white uppercase my-4'>PAUSE</h1>
+            <Button
+              label='continue game'
+              centeredText
+              onClick={handleContinueGame}
+            />
+            <Button label='restart' centeredText onClick={handleRestart} />
+            <Button
+              label='quit game'
+              color='pink'
+              centeredText
+              onClick={() => {
+                navigate('/');
+              }}
+            />
+          </div>
+        </div>
+      )}
+
       <div className=''>
         <div className='grid grid-rows-auto grid-cols-[auto_1fr_auto] gap-x-[60px] items-center'>
-          <div className='row-span-1 col-span-1'></div>
-
+          <EmptyDiv />
           <nav className='my-12 row-span-1 col-span-1 flex  items-center h-fit justify-between'>
-            <button className='text-white uppercase heading-xs bg-purple-dark hover:bg-pink rounded-full px-5 py-2.5 transition'>
-              menu
-            </button>
-            <img src={Images['logo']} alt='logo' />
-            <button
-              onClick={handleRestart}
-              className='text-white uppercase heading-xs bg-purple-dark hover:bg-pink rounded-full px-5 py-2.5 transition'
-            >
-              restart
-            </button>
-          </nav>
-          {/* empty div */}
-          <div className='row-span-1 col-span-1'></div>
-          {/*  */}
-          <div className='bottom-[50px] w-[140px] h-[160px] bg-white border-3 border-black shadow-custom text-center rounded-[20px] relative row-span-1 col-span-1 '>
+            <GameButton label='menu' onClick={handleOpenMenu} />
             <img
-              src={Images['player-one']}
-              alt='player-one-icon'
-              className='absolute left-0 right-0 m-auto w-[54px] -top-[27px]'
+              src={Images['logo']}
+              alt='logo'
+              className='relative left-2.5'
             />
-            <p className='heading-s uppercase mt-[46px]'>player 1</p>
-            <p className='heading-l'>{player1Score}</p>
-          </div>
+            <GameButton label='restart' onClick={handleRestart} />
+          </nav>
+          <EmptyDiv />
+          <PlayerCard player={1} score={player1Score} />
           <main className='flex-grow row-span-1 col-span-1 items-center relative z-50'>
             <img
               className='z-10'
@@ -284,7 +314,14 @@ const PvP = () => {
                   <div key={idx}>
                     {x ? (
                       <div className='relative'>
-                        <img
+                        <motion.img
+                          animate={{
+                            y: [-150, 0, -30, 0, -10, 0], // the y position of the tile at each keyframe (0%, 40%, 60%, 70%, 80%, 100%)
+                          }}
+                          transition={{
+                            duration: 0.6,
+                            times: [0, 0.4, 0.6, 0.8, 0.9, 1], // the time at which each keyframe occurs (0%, 40%, 60%, 70%, 80%, 100%)
+                          }}
                           src={
                             Images[
                               x === 1
@@ -321,15 +358,14 @@ const PvP = () => {
                   winner ? `player ${winner}` : 'no one'
                 } `}</p>
                 <p className='heading-l'>wins</p>
-                <button
-                  onClick={handleReset}
-                  className='text-white uppercase heading-xs bg-purple-dark hover:bg-pink rounded-full px-5 py-2.5 transition'
-                >
-                  play again
-                </button>
+                <GameButton label='play again' onClick={handleReset} />
               </div>
             ) : (
-              <div className='text-center text-white absolute left-0 right-0 m-auto flex w-fit z-50 -bottom-[110px]'>
+              <div
+                className={`text-center ${
+                  turn === 1 ? 'text-white' : 'text-black'
+                } absolute left-0 right-0 m-auto flex w-fit z-50 -bottom-[110px]`}
+              >
                 <img
                   src={
                     Images[
@@ -373,23 +409,18 @@ const PvP = () => {
             </div>
             {/*  */}
           </main>
-
-          <div className='bottom-[50px] w-[140px] h-[160px] bg-white border-3 border-black shadow-custom text-center rounded-[20px] relative row-span-1 col-span-1'>
-            <img
-              src={Images['player-two']}
-              alt='player-two-icon'
-              className='absolute left-0 right-0 m-auto w-[54px] -top-[27px]'
-            />
-            <p className='heading-s uppercase mt-[46px]'>player 2</p>
-            <p className='heading-l'>{player2Score}</p>
-          </div>
+          <PlayerCard player={2} score={player2Score} />
         </div>
       </div>
       <div
-        className={`h-[30%] ${color} w-full bottom-0 absolute rounded-t-[60px]`}
+        className={`h-[200px] ${color} w-full bottom-0 absolute rounded-t-[60px]`}
       ></div>
     </div>
   );
 };
 
 export default PvP;
+
+const EmptyDiv = () => {
+  return <div className='row-span-1 col-span-1'></div>;
+};
