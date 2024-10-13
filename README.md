@@ -1,46 +1,32 @@
-# Getting Started with Create React App
+# Connect Four Game
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This is a **Connect Four** game built using **ReactJS**, inspired by the [Frontend Mentor challenge](https://www.frontendmentor.io/challenges/connect-four-game-6G8QVH923s). The game allows two players to alternate turns on the same computer, dropping discs into a grid to see who can connect four of their discs in a row first.
 
-## Available Scripts
+![connect4](https://github.com/user-attachments/assets/e59684e1-112f-44ca-a5c3-cfa76e58cbbd)
 
-In the project directory, you can run:
+## Table of Contents
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [How to Play](#how-to-play)
+- [Acknowledgements](#acknowledgements)
 
-### `npm start`
+## Features
+- **Two-player mode**: Human vs. human gameplay, alternating turns on the same computer.
+- **Dynamic game board**: Players drop discs into a 7x6 grid, and the game checks for the first to connect four discs horizontally, vertically, or diagonally.
+- **Responsive design**: Adapted for various screen sizes, providing an optimal experience on desktop and mobile devices.
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Tech Stack
+- **ReactJS**: The core library used to build the interactive game.
+- **TypeScript**: For type safety and improved developer experience.
+- **SCSS**: For styling and organizing styles in a modular way.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+## How to Play
+1. The game is played on a 7x6 grid.
+2. Player 1 (red disc) goes first, followed by Player 2 (yellow disc).
+3. Players alternate turns, clicking on a column to drop their disc into the lowest available space.
+4. The first player to connect four discs horizontally, vertically, or diagonally wins the game.
+5. If the grid is full and no player has connected four, the game results in a draw.
 
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
-
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
-
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+## Acknowledgements
+- This project was built as part of the [Frontend Mentor](https://www.frontendmentor.io/challenges/connect-four-game-6G8QVH923s) challenge.
+- Special thanks to [Frontend Mentor](https://www.frontendmentor.io) for providing this challenge and design guidelines.
